@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Play Store Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    (function () {
+        let t = null;
+        try { t = localStorage.getItem("theme"); } catch (e) {}
+        if (!t) t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", t);
+     })(); 
+    </script>
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="layout">
+
+    <!-- Sidebar: filters (not wired up yet) -->
+    <aside class="sidebar">
+        <div class="brand">
+            <h1>Group 5</h1>
+        </div>
+
+        <div class="filter">
+            <label>Category</label>
+            <details class="multi" id="f-category">
+            <summary id="f-category-summary">All categories</summary>
+            <div class="multi-actions">
+                <button type="button" id="cat-all" class="link">Select all</button>
+                <button type="button" id="cat-none" class="link">Clear</button>
+            </div>
+            <div class="options" id="f-category-options"></div>
+            </details>
+        </div>
+
+        <div class="filter">
+            <label>Type</label>
+            <div class="seg" id="f-type">
+            <button type="button" data-value="All" class="active">All</button>
+            <button type="button" data-value="Free">Free</button>
+            <button type="button" data-value="Paid">Paid</button>
+            </div>
+        </div>
+
+        <div class="filter">
+            <label for="f-content">Content rating</label>
+            <select id="f-content"><option value="All">All</option></select>
+        </div>
+
+        <div class="filter">
+            <label>Rating range <span id="rating-label" class="val">1.0 – 5.0</span></label>
+            <div class="range-row"><span>Min</span><input type="range" id="f-rmin" min="1" max="5" step="0.1" value="1" /></div>
+            <div class="range-row"><span>Max</span><input type="range" id="f-rmax" min="1" max="5" step="0.1" value="5" /></div>
+        </div>
+
+        <div class="filter">
+            <label for="f-installs">Minimum installs</label>
+            <select id="f-installs">
+            <option value="0">Any</option>
+            <option value="1000">1K+</option>
+            <option value="10000">10K+</option>
+            <option value="100000">100K+</option>
+            <option value="1000000">1M+</option>
+            <option value="10000000">10M+</option>
+            <option value="100000000">100M+</option>
+            </select>
+        </div>
+
+        <button id="reset" class="ghost">Reset filters</button>
+        <p class="foot">CSA202 · GCIT</p>
+    </aside>
+
+    <!-- Main area -->
+    <main class="main">
+        <header class="top">
+            <h2>Dashboard</h2>
+            <button id="theme-toggle" class="ghost icon" aria-label="Toggle light/dark mode"></button>
+        </header>
+
+            <section class="kpis">
+                <div class="card kpi"><span class="muted">Apps</span><strong id="kpi-apps">–</strong></div>
+                <div class="card kpi"><span class="muted">Average rating</span><strong id="kpi-rating">–</strong></div>
+                <div class="card kpi"><span class="muted">Free apps</span><strong id="kpi-free">–</strong></div>
+                <div class="card kpi"><span class="muted">Median installs</span><strong id="kpi-installs">–</strong></div>
+            </section>
+
+            <section class="grid">
+            <div class="card span-2">
+                <div class="card-head">
+                <h3>Apps by category</h3>
+                <div class="tools">
+                    <select class="mini" data-opt="catTop" data-redraw="chart-category">
+                    <option value="5">Top 5</option>
+                    <option value="10">Top 10</option>
+                    <option value="15" selected>Top 15</option>
+                    <option value="all">All</option>
+                    </select>
+                    <div class="seg mini" data-opt="catSort" data-redraw="chart-category">
+                    <button type="button" data-value="count" class="active">Most apps</button>
+                    <button type="button" data-value="az">A–Z</button>
+                    </div>
+                    <details class="pop" id="cat-pop">
+                    <summary id="cat-pop-summary">Categories</summary>
+                    <div class="pop-panel">
+                        <div class="multi-actions">
+                        <button type="button" id="pick-all" class="link">Select all</button>
+                        <button type="button" id="pick-none" class="link">Clear</button>
+                        </div>
+                        <div class="options" id="cat-pick-options"></div>
+                    </div>
+                    </details>
+                </div>
+                </div>
+                <div id="chart-category" class="chart"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-head">
+                <h3>Rating distribution</h3>
+                <div class="seg mini" data-opt="ratingMode" data-redraw="chart-rating">
+                    <button type="button" data-value="count" class="active">Count</button>
+                    <button type="button" data-value="percent">%</button>
+                </div>
+                </div>
+                <div id="chart-rating" class="chart"></div>
+            </div>
+
+            <div class="card"><h3>Free vs paid</h3><div id="chart-type" class="chart"></div></div>
+
+            <div class="card">
+                <div class="card-head">
+                <h3>Installs vs reviews</h3>
+                <div class="seg mini" data-opt="scatterScale" data-redraw="chart-scatter">
+                    <button type="button" data-value="log" class="active">Log</button>
+                    <button type="button" data-value="linear">Linear</button>
+                </div>
+                </div>
+                <div id="chart-scatter" class="chart"></div>
+            </div>
+
+            <div class="card"><h3>Size vs rating</h3><div id="chart-size" class="chart"></div></div>
+
+            <div class="card span-3">
+                <h3>Spearman's Correlations</h3>
+                <div id="chart-heatmap" class="chart"></div>
+            </div>
+            </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
